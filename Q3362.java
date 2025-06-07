@@ -22,6 +22,74 @@ Input: nums = [1,2,3,4], queries = [[0,3]]
 Output: -1
 Explanation:
 nums cannot be converted to a zero array even after using all the queries. */
-public class Q3362 {
+import java.util.*;
 
+public class Q3362 {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        // Prompt and read nums array
+        System.out.print("Enter size of nums array: ");
+        int n = sc.nextInt();
+        int[] nums = new int[n];
+        System.out.println("Enter " + n + " elements of nums array:");
+        for(int i = 0; i < n; i++) nums[i] = sc.nextInt();
+
+        // Prompt and read queries
+        System.out.print("Enter number of queries: ");
+        int q = sc.nextInt();
+        int[][] queries = new int[q][2];
+        System.out.println("Enter each query as two space-separated integers [li ri]:");
+        for(int i = 0; i < q; i++) {
+            System.out.print("Query " + (i + 1) + ": ");
+            queries[i][0] = sc.nextInt();
+            queries[i][1] = sc.nextInt();
+        }
+
+        // Call the main function and print result
+        int result = maxRemovableQueries(nums, queries);
+        System.out.println("Maximum number of queries that can be removed: " + result);
+    }
+
+    // Main function
+    public static int maxRemovableQueries(int[] nums, int[][] queries) {
+        int n = nums.length, m = queries.length;
+        int low = 0, high = m, ans = -1;
+
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            if (canMakeZero(nums, queries, mid)) {
+                ans = mid;
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        return ans;
+    }
+
+    // Check if array can be reduced to zero with m-k queries
+    private static boolean canMakeZero(int[] nums, int[][] queries, int k) {
+        int n = nums.length, m = queries.length;
+
+        int[] diff = new int[n + 2];
+        for (int i = 0; i < m - k; i++) {
+            int l = queries[i][0];
+            int r = queries[i][1];
+            diff[l] += 1;
+            if (r + 1 < n) diff[r + 1] -= 1;
+        }
+
+        int[] apply = new int[n];
+        int sum = 0;
+        for (int i = 0; i < n; i++) {
+            sum += diff[i];
+            apply[i] = sum;
+        }
+
+        for (int i = 0; i < n; i++) {
+            if (apply[i] < nums[i]) return false;
+        }
+        return true;
+    }
 }
